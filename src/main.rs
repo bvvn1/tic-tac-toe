@@ -64,11 +64,11 @@ fn draw_game(g: &mut Game){
 
         execute!(stdout(), terminal::Clear(ClearType::All));
 
-        g.grid[g.prev.x][g.prev.y] = ' ';
+        g.grid[g.prev.y][g.prev.x] = ' ';
 
         handle_inputs(&mut g.cursor);
 
-        g.grid[g.cursor.x][g.cursor.y] = '_';
+        g.grid[g.cursor.y][g.cursor.x] = '_';
 
         g.prev.x = g.cursor.x;
         g.prev.y = g.cursor.y;
@@ -76,10 +76,10 @@ fn draw_game(g: &mut Game){
 
 
         for rows in g.grid{
-            println!("{:?}", rows);
+            println!("\n{:?}", rows);
         }
         
-        sleep(Duration::from_millis(1000));
+        sleep(Duration::from_millis(10));
 
     }
 
@@ -90,18 +90,18 @@ fn handle_inputs(cursor: &mut Cursor) {
 
     terminal::enable_raw_mode();
 
-    if poll(Duration::from_millis(100)).unwrap() {
+    if poll(Duration::from_millis(1)).unwrap() {
         if let Event::Key(event) = read().unwrap() {
             if event.kind == KeyEventKind::Press {
                 match event.code {
                     KeyCode::Up => {
                         if cursor.y > 0 {             //tuka ima out of bounds fixni go tupak
-                            cursor.y += 1;
+                            cursor.y -= 1;
                         }
                     }
                     KeyCode::Down => {
                         if cursor.y < 2 {
-                            cursor.y -= 1;
+                            cursor.y += 1;
                         }
                     }
                     KeyCode::Right => {
