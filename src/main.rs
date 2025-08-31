@@ -1,19 +1,27 @@
-use inputbot;
+use crossterm::terminal::ClearType;
+use crossterm::{event, execute, terminal};
 use std::{thread::sleep, time::Duration};
-use std::io::Write;
+use std::io::{stdout, Write};
 
 fn main() {
-
-
-    draw_game();
+    let mut cursor: (usize, usize) =(0, 0);
+    if cursor.0 > 3 || cursor.1 > 3 {
+        panic!("Out of bounds");
+    }
     
+
+    draw_game(&mut cursor);
+    
+
+
+   
     
 }
 
 
-fn draw_game(){
+fn draw_game(cursor: &mut (usize, usize)){
 
-    let mut cursor: (usize, usize) =(0, 0);
+
 
     let mut grid:[[char; 3]; 3] = 
     [[' ', ' ', ' '],
@@ -21,27 +29,36 @@ fn draw_game(){
      [' ', ' ', ' ']
     ];
 
+
+    
+
     //infinite loop
     loop{
 
+
+        handle_inputs(cursor);
+
         grid[cursor.0][cursor.1] = '_';
 
-        for row in grid{
+        print!("{:?}", cursor);
+
+         
+        for row in &grid{
         println!("{:?}", row)
         }
-
+        
         sleep(Duration::from_millis(1000));
 
-
-        clear_console();
+        execute!(stdout(), terminal::Clear(ClearType::All));
+    
 
     }
 
 }
 
-fn clear_console() {
-    // The ANSI escape code for clearing the terminal screen
-    print!("\x1B[2J\x1B[1;1H");
-    // Flush the output to ensure the console is cleared immediately
-    std::io::stdout().flush().unwrap();
+
+fn handle_inputs(cursor: &mut (usize, usize)) {
+    
+
+
 }
