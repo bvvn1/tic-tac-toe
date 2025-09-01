@@ -10,24 +10,29 @@ use game::Game;
 
 fn main() {
     let mut game = Game::new();
-    game.cursor.goto(1, 2);
+
     draw_game(&mut game);
 }
 
 fn draw_game(g: &mut Game) {
     loop {
         execute!(stdout(), terminal::Clear(ClearType::All)).expect("failed to clear :(");
-
-        g.grid[g.prev.y][g.prev.x] = ' ';
-
-        handle_inputs(&mut g.cursor);
-
-        g.grid[g.cursor.y][g.cursor.x] = '_';
+        if g.grid[g.prev.y][g.prev.x] == '_' {
+            g.grid[g.prev.y][g.prev.x] = ' ';
+        }
+        handle_inputs(g);
+        if g.grid[g.cursor.y][g.cursor.x] == 'x' {
+            g.grid[g.cursor.y][g.cursor.x] = 'Ⓧ';
+        } else if g.grid[g.cursor.y][g.cursor.x] == 'y' {
+            g.grid[g.cursor.y][g.cursor.x] = 'Ⓨ';
+        } else {
+            g.grid[g.cursor.y][g.cursor.x] = '_';
+        }
 
         g.prev.x = g.cursor.x;
         g.prev.y = g.cursor.y;
 
-        for rows in g.grid {
+        for rows in &g.grid {
             println!("\n{:?}", rows);
         }
 
@@ -35,7 +40,9 @@ fn draw_game(g: &mut Game) {
     }
 }
 
-fn handle_inputs(cursor: &mut Cursor) {
+fn handle_inputs(g: &mut Game) {
+    let turn = false;
+
     if let Err(e) = terminal::enable_raw_mode() {
         panic!("{}", e);
     }
@@ -45,25 +52,38 @@ fn handle_inputs(cursor: &mut Cursor) {
             if event.kind == KeyEventKind::Press {
                 match event.code {
                     KeyCode::Up => {
-                        if cursor.y > 0 {
-                            cursor.y -= 1;
+                        if g.cursor.y > 0 {
+                            g.cursor.y -= 1;
                         }
                     }
                     KeyCode::Down => {
-                        if cursor.y < 2 {
-                            cursor.y += 1;
+                        if g.cursor.y < 2 {
+                            g.cursor.y += 1;
                         }
                     }
                     KeyCode::Right => {
-                        if cursor.x < 2 {
-                            cursor.x += 1;
+                        if g.cursor.x < 2 {
+                            g.cursor.x += 1;
                         }
                     }
                     KeyCode::Left => {
-                        if cursor.x > 0 {
-                            cursor.x -= 1;
+                        if g.cursor.x > 0 {
+                            g.cursor.x -= 1;
                         }
                     }
+                    KeyCode::Enter => {
+                        if turn == false {
+                            g.grid[g.cursor.x][g.cursor.y] = 'x';
+                            // g.grid_without_cursor[g.cursor.x][g.cursor.y] = 'x';
+                            turn == true;
+                        }
+                        if turn == true {
+                            g.grid[g.cursor.x][g.cursor.y] = 'y';
+                            // g.grid_without_cursor[g.cursor.x][g.cursor.y] = 'y';
+                            turn == false;
+                        }
+                    }
+
                     _ => {}
                 }
             }

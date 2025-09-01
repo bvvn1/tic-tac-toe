@@ -1,6 +1,7 @@
 #[derive(Debug)]
 pub struct Game {
     pub grid: [[char; 3]; 3],
+    pub grid_without_cursor: [[char; 3]; 3],
     pub cursor: Cursor,
     pub prev: Cursor,
 }
@@ -25,6 +26,7 @@ impl Game {
     pub fn new() -> Self {
         Self {
             grid: [[' '; 3]; 3],
+            grid_without_cursor: [[' '; 3]; 3],
             cursor: Cursor::new(),
             prev: Cursor::new(),
         }
