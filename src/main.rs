@@ -1,68 +1,22 @@
-use crossterm::event::{read, Event, KeyEventKind, KeyCode, poll};
+use crossterm::event::{Event, KeyCode, KeyEventKind, poll, read};
 use crossterm::terminal::ClearType;
-use crossterm::{event, execute, terminal};
+use crossterm::{execute, terminal};
+use std::io::stdout;
 use std::{thread::sleep, time::Duration};
-use std::io::{stdout, Write};
 
+mod game;
+use game::Cursor;
+use game::Game;
 
-#[derive(Debug)]
-struct Cursor{
-    x: usize,
-    y: usize
-}
-
-impl Cursor{
-    fn new() -> Self{
-        Self{
-            x: 0,
-            y: 0
-        }
-    }
-    pub fn goto(&mut self, x: usize, y: usize) {
-        self.x = x;
-        self.y = y;
-    }
-
-}
-
-#[derive(Debug)]
-struct Game{
-    grid: [[char; 3]; 3],
-    cursor: Cursor,
-    prev: Cursor
-}
-
-
-impl Game{
-    fn new() -> Self{
-        Self{
-            grid: [[' '; 3]; 3],
-            cursor: Cursor::new(),
-            prev: Cursor::new()
-            
-        }
-    }
-}
-
-
-
-fn main(){
-    let mut game = Game::new();    
+fn main() {
+    let mut game = Game::new();
     game.cursor.goto(1, 2);
     draw_game(&mut game);
-
 }
 
-
-fn draw_game(g: &mut Game){
-
-
-
-
-
-    loop{
-
-        execute!(stdout(), terminal::Clear(ClearType::All));
+fn draw_game(g: &mut Game) {
+    loop {
+        execute!(stdout(), terminal::Clear(ClearType::All)).expect("failed to clear :(");
 
         g.grid[g.prev.y][g.prev.x] = ' ';
 
@@ -73,29 +27,25 @@ fn draw_game(g: &mut Game){
         g.prev.x = g.cursor.x;
         g.prev.y = g.cursor.y;
 
-
-
-        for rows in g.grid{
+        for rows in g.grid {
             println!("\n{:?}", rows);
         }
-        
+
         sleep(Duration::from_millis(10));
-
     }
-
 }
 
-
 fn handle_inputs(cursor: &mut Cursor) {
-
-    terminal::enable_raw_mode();
+    if let Err(e) = terminal::enable_raw_mode() {
+        panic!("{}", e);
+    }
 
     if poll(Duration::from_millis(1)).unwrap() {
         if let Event::Key(event) = read().unwrap() {
             if event.kind == KeyEventKind::Press {
                 match event.code {
                     KeyCode::Up => {
-                        if cursor.y > 0 {             //tuka ima out of bounds fixni go tupak
+                        if cursor.y > 0 {
                             cursor.y -= 1;
                         }
                     }
@@ -119,5 +69,7 @@ fn handle_inputs(cursor: &mut Cursor) {
             }
         }
     }
-    terminal::disable_raw_mode();
+    if let Err(e) = terminal::disable_raw_mode() {
+        panic!("{}", e);
+    }
 }
