@@ -10,11 +10,11 @@ use crate::game::{TicTacToe, handle_inputs};
 pub mod game;
 
 fn game() {
-    let mut g = TicTacToe::new();
+    let g: &mut TicTacToe = &mut TicTacToe::new();
 
     loop {
         execute!(stdout(), terminal::Clear(ClearType::All)).expect("those who know");
-        handle_inputs(&mut g);
+        handle_inputs(g);
 
         for (i, row) in g.board.iter().enumerate() {
             for (j, col) in row.iter().enumerate() {
@@ -29,6 +29,17 @@ fn game() {
         }
 
         sleep(Duration::from_millis(10));
+
+        if g.check_winner() == Some(game::Cell::O) {
+            println!("O wins!");
+            break;
+        } else if g.check_winner() == Some(game::Cell::X) {
+            println!("X wins!");
+            break;
+        } else if g.is_draw() == true {
+            println!("Draw!");
+            break;
+        }
     }
 }
 

@@ -5,7 +5,7 @@ use crossterm::{
     terminal,
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Cell {
     Empty,
     X,
@@ -50,6 +50,46 @@ impl TicTacToe {
             turn: false,
         }
     }
+
+    pub fn check_winner(&self) -> Option<Cell> {
+        for i in 0..3 {
+            if self.board[i][0] != Cell::Empty
+                && self.board[i][0] == self.board[i][1]
+                && self.board[i][1] == self.board[i][2]
+            {
+                return Some(self.board[i][0]);
+            }
+        }
+        for j in 0..3 {
+            if self.board[0][j] != Cell::Empty
+                && self.board[0][j] == self.board[1][j]
+                && self.board[1][j] == self.board[2][j]
+            {
+                return Some(self.board[0][j]);
+            }
+        }
+
+        if self.board[0][0] != Cell::Empty
+            && self.board[0][0] == self.board[1][1]
+            && self.board[1][1] == self.board[2][2]
+        {
+            return Some(self.board[0][0]);
+        }
+        if self.board[0][2] != Cell::Empty
+            && self.board[1][1] == self.board[0][2]
+            && self.board[1][1] == self.board[2][0]
+        {
+            return Some(self.board[0][2]);
+        }
+
+        None
+    }
+
+    pub fn is_draw(&self) -> bool {
+        self.board
+            .iter()
+            .all(|row| row.iter().all(|c| *c != Cell::Empty))
+    }
 }
 
 pub fn handle_inputs(g: &mut TicTacToe) {
@@ -80,12 +120,14 @@ pub fn handle_inputs(g: &mut TicTacToe) {
                         }
                     }
                     KeyCode::Char(' ') => {
-                        if g.turn == false {
-                            g.board[g.pointer.y][g.pointer.x] = Cell::X;
-                            g.turn = true;
-                        } else if g.turn == true {
-                            g.board[g.pointer.y][g.pointer.x] = Cell::O;
-                            g.turn = false;
+                        if g.board[g.pointer.y][g.pointer.x] == Cell::Empty {
+                            if g.turn == false {
+                                g.board[g.pointer.y][g.pointer.x] = Cell::X;
+                                g.turn = true;
+                            } else if g.turn == true {
+                                g.board[g.pointer.y][g.pointer.x] = Cell::O;
+                                g.turn = false;
+                            }
                         }
                     }
                     _ => {}
