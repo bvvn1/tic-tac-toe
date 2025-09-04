@@ -9,7 +9,7 @@ use std::{thread::sleep, time::Duration};
 use crate::game::{TicTacToe, handle_inputs};
 pub mod game;
 
-fn game() {
+fn main() {
     let g: &mut TicTacToe = &mut TicTacToe::new();
 
     loop {
@@ -41,8 +41,4 @@ fn game() {
             break;
         }
     }
-}
-
-fn main() {
-    game();
 }
